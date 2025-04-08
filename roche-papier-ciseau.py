@@ -35,11 +35,12 @@ class MyGame(arcade.Window):
         }
         # Si vous avez des listes de sprites, il faut les créer ici et les
         # initialiser à None.
+        # variable qui sert a determiner le gagnant pour ensuite afficher le texte
         self.gagant = 0
         self.status = False
+        # les variables qui gere les des joueurs
         self.pt_joueur = 0
         self.pt_ordi = 0
-        self.resultat = 0
         self.choix_joueur = ''
         self.choix_ordi = ''
         self.flag = False
@@ -83,6 +84,7 @@ class MyGame(arcade.Window):
         # plan selon la couleur spécifié avec la méthode "set_background_color".
         self.clear()
         self.base_sprite.draw()
+        # dessin des bases du jeu qui sont tout le temps afficher
         arcade.draw_lbwh_rectangle_outline(125,150,50,50,arcade.color.RED)
         arcade.draw_lbwh_rectangle_outline(200, 150, 50, 50, arcade.color.RED)
         arcade.draw_lbwh_rectangle_outline(275, 150, 50, 50, arcade.color.RED)
@@ -90,17 +92,23 @@ class MyGame(arcade.Window):
         arcade.draw_text('ROCHE, PAPIER, CISEAU', 100, 500, arcade.color.RED, 50)
         arcade.draw_text('le pointage du joueur est : ' + str(self.pt_joueur), 50, 100, arcade.color.RED, 20)
         arcade.draw_text('le pointage de lordinateur est : ' + str(self.pt_ordi), 400, 100, arcade.color.RED, 20)
-        if self.game_state == GameState.GAME_OVER:
-            arcade.draw_text('FIN DE LA PARTIE, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 19)
+        
+        if self.game_state == GameState.NOT_STARTED:
+            arcade.draw_text('APPUYER SUR ESPACE POUR COMMENCER LE JEU', 150, 430, arcade.color.RED, 17)
+        elif self.game_state == GameState.GAME_OVER:
+            if self.pt_joueur >= 3:
+                arcade.draw_text('FIN DE LA PARTIE, LE JOUEUR A GAGNER, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 17)
+            elif self.pt_ordi >= 3:
+                arcade.draw_text('FIN DE LA PARTIE, LORDI A GAGNER, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 17)
         elif self.game_state == GameState.ROUND_DONE:
-            arcade.draw_text('ROUND DONE, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 19)
+            arcade.draw_text('ROUND DONE, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 17)
         elif self.status == False:
             if self.gagant == 3:
-                arcade.draw_text('EGALITER, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 19)
+                arcade.draw_text('EGALITER, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 17)
             elif self.gagant == 1:
-                arcade.draw_text('LE JOUEUR A GAGNER, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 19)
+                arcade.draw_text('LE JOUEUR A GAGNER LA RONDE, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 17)
             elif self.gagant == 2:
-                arcade.draw_text('LORDINATEUR A GAGNER, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 19)
+                arcade.draw_text('LORDINATEUR A GAGNER LA RONDE, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 17)
         # Invoquer la méthode "draw()" de vos sprites ici.
         if self.game_state == GameState.ROUND_ACTIVE:
             self.game_sprite.draw()
@@ -156,7 +164,7 @@ class MyGame(arcade.Window):
                 self.flag = False
                 self.pt_joueur = 0
                 self.pt_ordi = 0
-                self.resultat = 0
+                self.gagant = 0
                 self.game_state = GameState.ROUND_ACTIVE
                 # mettre les pointage a zero
             elif self.game_state == GameState.ROUND_DONE:
@@ -177,7 +185,7 @@ class MyGame(arcade.Window):
                 self.choix_ordi = ''
                 self.pt_joueur = 0
                 self.pt_ordi = 0
-                self.resultat = 0
+                self.gagant = 0
                 self.game_state = GameState.ROUND_ACTIVE
                 # mettre les pointage a zero
             elif self.status == False:
@@ -208,10 +216,13 @@ class MyGame(arcade.Window):
             print('pc_cisor')
 
         if self.choix_ordi == 'roche' and self.choix_joueur == 'roche':
+            self.gagant = 3
             self.status = False
         elif self.choix_ordi == 'paper' and self.choix_joueur == 'paper':
+            self.gagant = 3
             self.status = False
         elif self.choix_ordi == 'cisor' and self.choix_joueur == 'cisor':
+            self.gagant = 3
             self.status = False
         elif self.choix_ordi == 'paper' and self.choix_joueur == 'cisor':
             self.pt_joueur += 1
