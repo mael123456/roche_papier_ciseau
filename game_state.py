@@ -6,6 +6,7 @@ description : jeu de roche papier ciseau
 
 from enum import Enum
 
+
 class GameState(Enum):
     ROUND_DONE = 0
     GAME_OVER = 1
