@@ -5,19 +5,18 @@ description : jeu de roche papier ciseau
 """
 
 import arcade
-import time
 import random
 from attack_animation import *
 from game_state import GameState
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN_TITLE = "Modèle de départ"
+SCREEN_TITLE = "roche papier ciseau"
 
 
-#classe qui gere tout le jeu
 class MyGame(arcade.Window):
     """
+
     La classe principale de l'application
 
     NOTE: Vous pouvez effacer les méthodes que vous n'avez pas besoin.
@@ -39,12 +38,15 @@ class MyGame(arcade.Window):
         self.gagant = 0
         self.status = False
         # les variables qui gere les des joueurs
+        self.nb_choix = -1
         self.pt_joueur = 0
         self.pt_ordi = 0
         self.choix_joueur = ''
         self.choix_ordi = ''
         self.flag = False
-        self.game_sprite = arcade.SpriteList()
+        self.game_sprite_rock = arcade.SpriteList()
+        self.game_sprite_paper = arcade.SpriteList()
+        self.game_sprite_cisor = arcade.SpriteList()
         self.base_sprite = arcade.SpriteList()
         self.pc_sprite = arcade.SpriteList()
         self.pc_rock = AttackAnimation(AttackType.ROCK, 575, 175)
@@ -56,14 +58,15 @@ class MyGame(arcade.Window):
         self.pc_sprite_paper.append(self.pc_paper)
         self.pc_sprite_rock.append(self.pc_rock)
         self.pc_sprite_cisor.append(self.pc_cisor)
+
         self.rock = AttackAnimation(AttackType.ROCK,150,175)
         self.cisor = AttackAnimation(AttackType.SCISSORS,225,175)
         self.paper = AttackAnimation(AttackType.PAPER,300,175)
         ordinateur = arcade.Sprite("assets/compy.png", 1, 575, 250)
         visage = arcade.Sprite("assets/faceBeard.png", .22, 225, 250)
-        self.game_sprite.append(self.cisor)
-        self.game_sprite.append(self.paper)
-        self.game_sprite.append(self.rock)
+        self.game_sprite_cisor.append(self.cisor)
+        self.game_sprite_paper.append(self.paper)
+        self.game_sprite_rock.append(self.rock)
         self.base_sprite.append(ordinateur)
         self.base_sprite.append(visage)
         self.game_state = GameState.NOT_STARTED
@@ -92,7 +95,7 @@ class MyGame(arcade.Window):
         arcade.draw_text('ROCHE, PAPIER, CISEAU', 100, 500, arcade.color.RED, 50)
         arcade.draw_text('le pointage du joueur est : ' + str(self.pt_joueur), 50, 100, arcade.color.RED, 20)
         arcade.draw_text('le pointage de lordinateur est : ' + str(self.pt_ordi), 400, 100, arcade.color.RED, 20)
-        
+
         if self.game_state == GameState.NOT_STARTED:
             arcade.draw_text('APPUYER SUR ESPACE POUR COMMENCER LE JEU', 150, 430, arcade.color.RED, 17)
         elif self.game_state == GameState.GAME_OVER:
@@ -102,7 +105,7 @@ class MyGame(arcade.Window):
                 arcade.draw_text('FIN DE LA PARTIE, LORDI A GAGNER, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 17)
         elif self.game_state == GameState.ROUND_DONE:
             arcade.draw_text('ROUND DONE, APPUYER SUR ESPACE POUR RECOMMENCER', 20, 430, arcade.color.RED, 17)
-        elif self.status == False:
+        elif not self.status:
             if self.gagant == 3:
                 arcade.draw_text('EGALITER, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 17)
             elif self.gagant == 1:
@@ -111,20 +114,24 @@ class MyGame(arcade.Window):
                 arcade.draw_text('LORDINATEUR A GAGNER LA RONDE, APPUYER SUR ESPACE POUR CONTINUER', 20, 430, arcade.color.RED, 17)
         # Invoquer la méthode "draw()" de vos sprites ici.
         if self.game_state == GameState.ROUND_ACTIVE:
-            self.game_sprite.draw()
+            if self.status:
+                self.game_sprite_rock.draw()
+                self.game_sprite_paper.draw()
+                self.game_sprite_cisor.draw()
+            else:
+                if self.choix_joueur == 'rock':
+                    self.game_sprite_rock.draw()
+                elif self.choix_joueur == 'paper':
+                    self.game_sprite_paper.draw()
+                if self.choix_joueur == 'cisor':
+                    self.game_sprite_cisor.draw()
+            #self.game_sprite.draw()
             if self.choix_ordi == 'roche':
                 self.pc_sprite_rock.draw()
             elif self.choix_ordi == 'paper':
                 self.pc_sprite_paper.draw()
             elif self.choix_ordi == 'cisor':
                 self.pc_sprite_cisor.draw()
-            else:
-                pass
-
-
-
-
-
 
     def on_update(self, delta_time):
         """
@@ -143,8 +150,6 @@ class MyGame(arcade.Window):
             self.pc_paper.on_update()
         elif self.choix_ordi == 'cisor':
             self.pc_cisor.on_update()
-        else:
-            pass
 
     def on_key_press(self, key, key_modifiers):
         """
@@ -188,17 +193,14 @@ class MyGame(arcade.Window):
                 self.gagant = 0
                 self.game_state = GameState.ROUND_ACTIVE
                 # mettre les pointage a zero
-            elif self.status == False:
+            elif not self.status:
                 if self.pt_ordi >= 3 or self.pt_joueur >= 3:
                     self.game_state = GameState.GAME_OVER
                 else:
                     self.game_state = GameState.ROUND_DONE
                 print('round done')
 
-
             print(self.game_state)
-        pass
-
 
     def computer_chose(self):
 
@@ -249,30 +251,6 @@ class MyGame(arcade.Window):
             self.gagant = 2
             self.status = False
 
-
-
-        pass
-
-
-
-    def on_key_release(self, key, key_modifiers):
-        """
-        Méthode invoquée à chaque fois que l'usager enlève son doigt d'une touche.
-        Paramètres:
-            - key: la touche relâchée
-            - key_modifiers: est-ce que l'usager appuie sur "shift" ou "ctrl" ?
-        """
-        pass
-
-    def on_mouse_motion(self, x, y, delta_x, delta_y):
-        """
-        Méthode invoquée lorsque le curseur de la souris se déplace dans la fenêtre.
-        Paramètres:
-            - x, y: les coordonnées de l'emplacement actuel de la sourir
-            - delta_X, delta_y: le changement (x et y) depuis la dernière fois que la méthode a été invoqué.
-        """
-        pass
-
     def on_mouse_press(self, x, y, button, key_modifiers):
 
         """
@@ -282,10 +260,10 @@ class MyGame(arcade.Window):
             - button: le bouton de la souris appuyé
             - key_modifiers: est-ce que l'usager appuie sur "shift" ou "ctrl" ?
         """
-        if self.flag  == False:
+        if not self.flag:
             if self.rock.collides_with_point((x, y)):
                 print('roche toucher')
-                self.choix_joueur = 'roche'
+                self.choix_joueur = 'rock'
                 self.flag = True
                 self.computer_chose()
             elif self.cisor.collides_with_point((x, y)):
@@ -298,17 +276,6 @@ class MyGame(arcade.Window):
                 self.choix_joueur = 'paper'
                 self.flag = True
                 self.computer_chose()
-        pass
-
-    def on_mouse_release(self, x, y, button, key_modifiers):
-        """
-        Méthode invoquée lorsque l'usager relâche le bouton cliqué de la souris.
-        Paramètres:
-            - x, y: coordonnées où le bouton a été relâché
-            - button: le bouton de la souris relâché
-            - key_modifiers: est-ce que l'usager appuie sur "shift" ou "ctrl" ?
-        """
-        pass
 
 
 def main():
