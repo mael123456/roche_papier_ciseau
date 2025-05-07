@@ -44,6 +44,16 @@ class MyGame(arcade.Window):
         self.choix_joueur = ''
         self.choix_ordi = ''
         self.flag = False
+        self.game_state = GameState.NOT_STARTED
+
+
+    def setup(self):
+        """
+        Configurer les variables de votre jeu ici. Il faut appeler la méthode une nouvelle
+        fois si vous recommencer une nouvelle partie.
+        """
+        # C'est ici que vous allez créer vos listes de sprites et vos sprites.
+        # C'est aussi ici que vous charger les sons de votre jeu.
         self.game_sprite_rock = arcade.SpriteList()
         self.game_sprite_paper = arcade.SpriteList()
         self.game_sprite_cisor = arcade.SpriteList()
@@ -69,17 +79,6 @@ class MyGame(arcade.Window):
         self.game_sprite_rock.append(self.rock)
         self.base_sprite.append(ordinateur)
         self.base_sprite.append(visage)
-        self.game_state = GameState.NOT_STARTED
-
-
-    def setup(self):
-        """
-        Configurer les variables de votre jeu ici. Il faut appeler la méthode une nouvelle
-        fois si vous recommencer une nouvelle partie.
-        """
-        # C'est ici que vous allez créer vos listes de sprites et vos sprites.
-        # C'est aussi ici que vous charger les sons de votre jeu.
-        pass
 
     def on_draw(self):
 
